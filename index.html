@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>강원대 원주캠 등굣길 브리핑</title>
   <style>
-    /* Reset & Base Styles (외부 라이브러리 없이 순수 CSS로 구현) */
+    /* Reset & Base Styles */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -24,7 +24,7 @@
       transition: background-color 0.4s ease;
     }
 
-    /* 날씨 테마별 배경 스타일 (미션 1) */
+    /* 날씨 테마별 배경 스타일 */
     body.theme-clear { background-color: #f0f9ff; }
     body.theme-cloudy { background-color: #f1f5f9; }
     body.theme-fog { background-color: #f3f4f6; }
@@ -160,7 +160,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* 도시 검색 창 (미션 3) */
+    /* 도시 검색 창 */
     .search-section {
       background-color: #ffffff;
       border-radius: 16px;
@@ -194,6 +194,23 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+    }
+
+    .search-message {
+      font-size: 0.875rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+
+    .search-message.info {
+      color: #64748b;
+      background-color: #f8fafc;
+    }
+
+    .search-message.error {
+      color: #ef4444;
+      background-color: #fef2f2;
+      border: 1px solid #fee2e2;
     }
 
     .search-result-item {
@@ -440,7 +457,7 @@
       font-weight: 700;
     }
 
-    /* 시간별 강수확률 막대그래프 스타일 (미션 2) */
+    /* 시간별 강수확률 막대그래프 스타일 */
     .hourly-graph-box {
       background-color: #ffffff;
       padding: 20px;
@@ -582,7 +599,7 @@
         <p class="subtitle">오늘 등굣길에 꼭 챙겨야 할 준비물을 알려드려요!</p>
       </div>
       
-      <!-- 헤더 우측 컨트롤 (새로고침, 위치 검색 토글) -->
+      <!-- 헤더 우측 컨트롤 -->
       <div class="header-actions">
         <button id="toggle-search-btn" onclick="toggleSearchBox()" class="btn btn-outline">
           🔍 도시 검색
@@ -599,16 +616,16 @@
       </div>
     </header>
 
-    <!-- 도시 검색 패널 (미션 3) -->
+    <!-- 도시 검색 패널 -->
     <section id="search-section" class="search-section hidden">
       <div class="search-box">
-        <input type="text" id="city-input" class="search-input" placeholder="도시 이름 검색 (예: 원주, 서울, Chuncheon, Tokyo)..." onkeyup="handleSearchKeyup(event)">
+        <input type="text" id="city-input" class="search-input" placeholder="도시 이름 검색 (예: 서울, 부산, 원주, Tokyo, London)..." onkeyup="handleSearchKeyup(event)">
         <button onclick="searchCity()" class="btn btn-dark">검색</button>
       </div>
       <div id="search-results" class="search-results"></div>
     </section>
 
-    <!-- 경고 배너 (부분 오류 시 발생) -->
+    <!-- 경고 배너 -->
     <div id="status-banner" class="banner banner-warning hidden"></div>
 
     <!-- 로딩 상태 표시 -->
@@ -666,7 +683,7 @@
         </div>
       </section>
 
-      <!-- 2. 시간별 강수확률 막대그래프 (미션 2) -->
+      <!-- 2. 시간별 강수확률 막대그래프 -->
       <section class="hourly-graph-box">
         <h2 class="section-title" style="margin-bottom: 4px;">
           <span>☔ 09시 ~ 18시 시간별 강수확률</span>
@@ -716,7 +733,7 @@
             <div id="val-pm25" class="metric-value">-- µg/m³</div>
           </div>
 
-          <!-- 시각 정보 (API 관측 시각 & 조회 시각 구분) -->
+          <!-- 시각 정보 -->
           <div class="metric-item" style="display: flex; flex-direction: column; justify-content: center;">
             <div class="metric-label">데이터 시각 정보</div>
             <div id="val-api-time" class="text-sm-val" style="color: #475569;">관측: --:--</div>
@@ -727,7 +744,7 @@
 
     </main>
 
-    <!-- 전면 에러 화면 (두 API 모두 실패 시) -->
+    <!-- 전면 에러 화면 -->
     <div id="error-screen" class="error-container hidden">
       <div class="error-icon">⚠️</div>
       <h3 class="error-title">데이터를 불러오지 못했습니다</h3>
@@ -749,13 +766,40 @@
       name: '강원대학교 원주캠퍼스',
       badge: '🏫 강원대학교 원주캠퍼스',
       lat: 37.30,
-      lon: 127.92
+      lon: 127.92,
+      timezone: 'Asia/Seoul'
+    };
+
+    // 지명 자동 매칭 대체 검색어 사전
+    const CITY_FALLBACK_MAP = {
+      '서울': ['서울특별시', 'Seoul'],
+      '부산': ['부산광역시', 'Busan'],
+      '인천': ['인천광역시', 'Incheon'],
+      '대구': ['대구광역시', 'Daegu'],
+      '원주': ['원주시', 'Wonju'],
+      '춘천': ['춘천시', 'Chuncheon'],
+      '대전': ['대전광역시', 'Daejeon'],
+      '광주': ['광주광역시', 'Gwangju'],
+      '울산': ['울산광역시', 'Ulsan'],
+      '수원': ['수원시', 'Suwon'],
+      '성남': ['성남시', 'Seongnam'],
+      '고양': ['고양시', 'Goyang'],
+      '용인': ['용인시', 'Yongin'],
+      '창원': ['창원시', 'Changwon'],
+      '청주': ['청주시', 'Cheongju'],
+      '전주': ['전주시', 'Jeonju'],
+      '천안': ['천안시', 'Cheonan'],
+      '제주': ['제주시', 'Jeju']
     };
 
     // 현재 활성화된 위치 정보
     let currentLocation = { ...DEFAULT_LOCATION };
 
-    // WMO 코드 표 및 배경 테마 정의 (미션 1)
+    // 레이스 조건 방지를 위한 글로벌 요청 추적 변수
+    let currentFetchRequestId = 0;
+    let searchAbortController = null;
+
+    // WMO 코드 표 및 배경 테마 정의
     const WMO_CODES = {
       0: { text: '맑음 ☀️', theme: 'theme-clear', icon: '☀️' },
       1: { text: '대체로 맑음 🌤️', theme: 'theme-cloudy', icon: '🌤️' },
@@ -801,7 +845,7 @@
     const resetLocBtn = document.getElementById('reset-loc-btn');
     const weatherDynamicIcon = document.getElementById('weather-dynamic-icon');
 
-    // 유효한 숫자 데이터인지 엄격하게 검증하는 helper (0도 유효한 숫자로 간주)
+    // 유효한 숫자 데이터인지 검증
     function isValidNumber(val) {
       return val !== null && val !== undefined && typeof val === 'number' && !isNaN(val);
     }
@@ -810,7 +854,7 @@
       fetchData();
     };
 
-    // 미션 3: 도시 검색 패널 토글
+    // 도시 검색 패널 토글
     function toggleSearchBox() {
       searchSection.classList.toggle('hidden');
       if (!searchSection.classList.contains('hidden')) {
@@ -824,72 +868,125 @@
       }
     }
 
-    // 미션 3: Open-Meteo Geocoding API 도시 검색
+    // 도시 검색 메시지 UI 헬퍼
+    function showSearchMessage(msg, type = 'info') {
+      searchResults.textContent = '';
+      const div = document.createElement('div');
+      div.className = `search-message ${type}`;
+      div.textContent = msg;
+      searchResults.appendChild(div);
+    }
+
+    // 안전한 검색 API 실행 함수 (Geocoding API 호출)
+    async function queryGeocodingApi(keyword, signal) {
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(keyword)}&count=5&language=ko`;
+      const res = await fetch(url, { signal });
+      if (!res.ok) throw new Error('Geocoding HTTP Error');
+      const data = await res.json();
+      return data && data.results ? data.results : [];
+    }
+
+    // 도시 검색 (대체 검색어 Fallback 및 레이스 조건 방지 반영)
     async function searchCity() {
       const query = cityInput.value.trim();
       if (!query) return;
 
-      searchResults.innerHTML = '<div style="font-size:0.875rem; color:#64748b; padding:8px;">검색 중...</div>';
+      // 이전 진행 중인 검색 요청 취소
+      if (searchAbortController) {
+        searchAbortController.abort();
+      }
+      searchAbortController = new AbortController();
+      const signal = searchAbortController.signal;
+
+      showSearchMessage('도시 정보를 검색 중입니다...', 'info');
 
       try {
-        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=ko`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Geocoding Error');
-        const data = await res.json();
+        // 1차 검색 진행
+        let results = await queryGeocodingApi(query, signal);
 
-        if (!data.results || data.results.length === 0) {
-          searchResults.innerHTML = '<div style="font-size:0.875rem; color:#ef4444; padding:8px;">검색 결과가 없습니다. 다른 도시 이름으로 검색해 보세요.</div>';
+        // 1차 검색 실패 시 대체 검색어로 재시도
+        if (results.length === 0 && CITY_FALLBACK_MAP[query]) {
+          const fallbacks = CITY_FALLBACK_MAP[query];
+          for (const fallbackKeyword of fallbacks) {
+            if (signal.aborted) return;
+            results = await queryGeocodingApi(fallbackKeyword, signal);
+            if (results.length > 0) break;
+          }
+        }
+
+        if (signal.aborted) return;
+
+        if (results.length === 0) {
+          showSearchMessage('검색 결과가 없습니다. 다른 도시 이름이나 영문(예: Seoul, Wonju)으로 검색해 보세요.', 'error');
           return;
         }
 
-        renderSearchResults(data.results);
+        renderSearchResults(results);
       } catch (e) {
+        if (e.name === 'AbortError') return; // 취소된 이전 요청 무시
         console.error('도시 검색 오류:', e);
-        searchResults.innerHTML = '<div style="font-size:0.875rem; color:#ef4444; padding:8px;">도시 정보를 불러올 수 없습니다.</div>';
+        showSearchMessage('도시 검색 중 오류가 발생했습니다. 네트워크 상태를 확인해 주세요.', 'error');
       }
     }
 
+    // 검색 결과 안전하게 DOM 렌더링 (textContent 사용)
     function renderSearchResults(results) {
-      searchResults.innerHTML = '';
+      searchResults.textContent = '';
+      
       results.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'search-result-item';
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'search-result-item';
+
+        const infoDiv = document.createElement('div');
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'search-result-name';
+        nameSpan.textContent = item.name || '';
 
         const regionParts = [item.admin1, item.country].filter(Boolean).join(', ');
-        
-        div.innerHTML = `
-          <div>
-            <span class="search-result-name">${item.name}</span>
-            <span class="search-result-sub"> (${regionParts})</span>
-          </div>
-          <span style="font-size:0.75rem; font-weight:600; color:#10b981;">선택 ➔</span>
-        `;
+        const subSpan = document.createElement('span');
+        subSpan.className = 'search-result-sub';
+        subSpan.textContent = regionParts ? ` (${regionParts})` : '';
 
-        div.onclick = () => selectCity(item);
-        searchResults.appendChild(div);
+        infoDiv.appendChild(nameSpan);
+        infoDiv.appendChild(subSpan);
+
+        const actionSpan = document.createElement('span');
+        actionSpan.style.fontSize = '0.75rem';
+        actionSpan.style.fontWeight = '600';
+        actionSpan.style.color = '#10b981';
+        actionSpan.textContent = '선택 ➔';
+
+        itemDiv.appendChild(infoDiv);
+        itemDiv.appendChild(actionSpan);
+
+        itemDiv.onclick = () => selectCity(item);
+        searchResults.appendChild(itemDiv);
       });
     }
 
-    // 미션 3: 선택한 도시 정보로 위치 변경 및 데이터 갱신
+    // 선택한 도시로 상태 변경 및 데이터 재호출
     function selectCity(city) {
       const regionName = [city.name, city.admin1].filter(Boolean).join(' ');
+      
       currentLocation = {
         name: city.name,
         badge: `📍 ${regionName}`,
         lat: city.latitude,
-        lon: city.longitude
+        lon: city.longitude,
+        timezone: city.timezone || 'Asia/Seoul'
       };
 
       locationBadge.textContent = currentLocation.badge;
       resetLocBtn.classList.remove('hidden');
       searchSection.classList.add('hidden');
-      searchResults.innerHTML = '';
+      searchResults.textContent = '';
       cityInput.value = '';
 
       fetchData();
     }
 
-    // 미션 3: 기본 원주캠퍼스로 돌아가기
+    // 기본 원주캠퍼스로 복귀
     function resetToDefaultLocation() {
       currentLocation = { ...DEFAULT_LOCATION };
       locationBadge.textContent = currentLocation.badge;
@@ -898,8 +995,11 @@
       fetchData();
     }
 
-    // 메인 API 호출 함수
+    // 메인 API 호출 (응답 덮어쓰기 방지 처리)
     async function fetchData() {
+      // 요청 고유 ID 증가
+      const requestId = ++currentFetchRequestId;
+
       loadingSpinner.classList.remove('hidden');
       contentArea.classList.add('hidden');
       errorScreen.classList.add('hidden');
@@ -907,8 +1007,9 @@
       refreshBtn.disabled = true;
       refreshIcon.classList.add('icon-spin');
 
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=temperature_2m,apparent_temperature,weather_code&hourly=precipitation_probability&timezone=Asia/Seoul&forecast_days=1`;
-      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=pm10,pm2_5&timezone=Asia/Seoul`;
+      const tz = encodeURIComponent(currentLocation.timezone);
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=temperature_2m,apparent_temperature,weather_code&hourly=precipitation_probability&timezone=${tz}&forecast_days=1`;
+      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=pm10,pm2_5&timezone=${tz}`;
 
       let weatherData = null;
       let airData = null;
@@ -935,6 +1036,11 @@
         airError = true;
       }
 
+      // 최신 요청이 아니면 무시 (이전 응답 덮어쓰기 방지)
+      if (requestId !== currentFetchRequestId) {
+        return;
+      }
+
       loadingSpinner.classList.add('hidden');
       refreshBtn.disabled = false;
       refreshIcon.classList.remove('icon-spin');
@@ -948,10 +1054,18 @@
 
       if (weatherError || airError) {
         const failedTarget = weatherError ? '날씨 정보' : '대기질 정보';
-        statusBanner.innerHTML = `
-          <span>⚠️ ${failedTarget}를 불러오지 못했습니다. 불러온 데이터만 표시합니다.</span>
-          <button onclick="fetchData()" class="banner-btn">다시 시도</button>
-        `;
+        statusBanner.textContent = '';
+        
+        const bannerText = document.createElement('span');
+        bannerText.textContent = `⚠️ ${failedTarget}를 불러오지 못했습니다. 불러온 데이터만 표시합니다.`;
+        
+        const bannerBtn = document.createElement('button');
+        bannerBtn.className = 'banner-btn';
+        bannerBtn.textContent = '다시 시도';
+        bannerBtn.onclick = fetchData;
+
+        statusBanner.appendChild(bannerText);
+        statusBanner.appendChild(bannerBtn);
         statusBanner.classList.remove('hidden');
       }
 
@@ -963,7 +1077,7 @@
       let apiObservedTime = null;
 
       // -------------------------------------------------------------
-      // 1. 날씨 데이터 파싱 및 판단 (09~18시 강수확률 최댓값, 체감온도)
+      // 1. 날씨 데이터 파싱 및 판단
       // -------------------------------------------------------------
       let maxPop = null;
       let currentTemp = null;
@@ -980,7 +1094,7 @@
         }
       }
 
-      // 미션 1: 날씨별 배경 테마 및 아이콘 업데이트
+      // 배경 테마 및 아이콘 업데이트
       updateWeatherTheme(weatherCode);
 
       if (weather && weather.hourly && Array.isArray(weather.hourly.time) && Array.isArray(weather.hourly.precipitation_probability)) {
@@ -997,7 +1111,6 @@
               const popVal = isValidNumber(pops[i]) ? pops[i] : null;
               if (popVal !== null) daytimePops.push(popVal);
 
-              // 미션 2: 시간별 막대그래프 데이터 세트 생성
               hourlyList.push({
                 hour: `${hour.toString().padStart(2, '0')}:00`,
                 pop: popVal
@@ -1011,7 +1124,7 @@
         }
       }
 
-      // 우산 카드 판단 (최대 강수확률 >= 50%)
+      // 우산 카드 판단
       if (isValidNumber(maxPop)) {
         document.getElementById('val-pop').textContent = `최대 ${maxPop}%`;
         if (maxPop >= 50) {
@@ -1024,7 +1137,7 @@
         updateCard('umbrella', '확인 불가', '09-18시 강수확률 데이터 없음', 'gray');
       }
 
-      // 겉옷 카드 판단 (체감온도 <= 10°C)
+      // 겉옷 카드 판단
       if (isValidNumber(apparentTemp)) {
         document.getElementById('val-apparent').textContent = `${apparentTemp} °C`;
         if (apparentTemp <= 10) {
@@ -1037,7 +1150,7 @@
         updateCard('coat', '확인 불가', '체감온도 수치 없음', 'gray');
       }
 
-      // 현재 기온 & 날씨 코드 표기
+      // 현재 기온 및 뱃지 표기
       document.getElementById('val-temp').textContent = isValidNumber(currentTemp) ? `${currentTemp} °C` : '확인 불가';
       const badge = document.getElementById('weather-code-badge');
       if (weatherCode !== null && WMO_CODES[weatherCode] !== undefined) {
@@ -1046,11 +1159,11 @@
         badge.textContent = '날씨 정보 없음';
       }
 
-      // 미션 2: 시간별 강수확률 막대그래프 렌더링
+      // 시간별 막대그래프 렌더링
       renderHourlyGraph(hourlyList);
 
       // -------------------------------------------------------------
-      // 2. 대기질 데이터 파싱 및 판단 (PM10, PM2.5)
+      // 2. 대기질 데이터 파싱 및 판단
       // -------------------------------------------------------------
       let pm10 = null;
       let pm2_5 = null;
@@ -1066,7 +1179,6 @@
       document.getElementById('val-pm10').textContent = isValidNumber(pm10) ? `${pm10} µg/m³` : '확인 불가';
       document.getElementById('val-pm25').textContent = isValidNumber(pm2_5) ? `${pm2_5} µg/m³` : '확인 불가';
 
-      // 마스크 카드 판단 규칙
       const pm10Valid = isValidNumber(pm10);
       const pm25Valid = isValidNumber(pm2_5);
 
@@ -1082,16 +1194,15 @@
       }
 
       // -------------------------------------------------------------
-      // 3. 데이터 시각 정보 표기 (관측 시각 vs 조회 시각)
+      // 3. 시각 정보 표기
       // -------------------------------------------------------------
       document.getElementById('val-api-time').textContent = `관측: ${apiObservedTime || '--:--'}`;
       document.getElementById('val-fetch-time').textContent = `조회: ${fetchTime}`;
     }
 
-    // 미션 1: WMO weather_code 기반 배경 테마 및 타이틀 아이콘 동적 업데이트
+    // 테마 동적 업데이트
     function updateWeatherTheme(code) {
-      document.body.className = ''; // 기존 테마 클래스 제거
-      
+      document.body.className = '';
       if (code !== null && WMO_CODES[code]) {
         const themeInfo = WMO_CODES[code];
         document.body.classList.add(themeInfo.theme);
@@ -1102,13 +1213,16 @@
       }
     }
 
-    // 미션 2: 시간별 강수확률 가로 막대그래프 렌더링
+    // 막대그래프 렌더링 (안전한 노드 생성 방식)
     function renderHourlyGraph(list) {
       const container = document.getElementById('hourly-graph-list');
-      container.innerHTML = '';
+      container.textContent = '';
 
       if (!list || list.length === 0) {
-        container.innerHTML = '<div style="font-size:0.875rem; color:#94a3b8; text-align:center; padding:12px;">강수확률 정보 없음</div>';
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'font-size:0.875rem; color:#94a3b8; text-align:center; padding:12px;';
+        emptyDiv.textContent = '강수확률 정보 없음';
+        container.appendChild(emptyDiv);
         return;
       }
 
@@ -1116,23 +1230,34 @@
         const row = document.createElement('div');
         row.className = 'hourly-item';
 
-        const valText = isValidNumber(item.pop) ? `${item.pop}%` : '-';
-        const barWidth = isValidNumber(item.pop) ? `${Math.min(Math.max(item.pop, 0), 100)}%` : '0%';
-        const isHigh = isValidNumber(item.pop) && item.pop >= 50;
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'hourly-time';
+        timeDiv.textContent = item.hour;
 
-        row.innerHTML = `
-          <div class="hourly-time">${item.hour}</div>
-          <div class="hourly-bar-container">
-            <div class="hourly-bar ${isHigh ? 'high-prob' : ''}" style="width: ${barWidth};"></div>
-          </div>
-          <div class="hourly-value" style="${isHigh ? 'color:#e11d48;' : ''}">${valText}</div>
-        `;
+        const barContainer = document.createElement('div');
+        barContainer.className = 'hourly-bar-container';
+
+        const bar = document.createElement('div');
+        const isHigh = isValidNumber(item.pop) && item.pop >= 50;
+        bar.className = `hourly-bar ${isHigh ? 'high-prob' : ''}`;
+        bar.style.width = isValidNumber(item.pop) ? `${Math.min(Math.max(item.pop, 0), 100)}%` : '0%';
+
+        barContainer.appendChild(bar);
+
+        const valDiv = document.createElement('div');
+        valDiv.className = 'hourly-value';
+        if (isHigh) valDiv.style.color = '#e11d48';
+        valDiv.textContent = isValidNumber(item.pop) ? `${item.pop}%` : '-';
+
+        row.appendChild(timeDiv);
+        row.appendChild(barContainer);
+        row.appendChild(valDiv);
 
         container.appendChild(row);
       });
     }
 
-    // 카드 UI 업데이트
+    // 카드 상태 업데이트
     function updateCard(type, title, desc, colorTheme) {
       const card = document.getElementById(`card-${type}`);
       const statusEl = document.getElementById(`${type}-status`);
