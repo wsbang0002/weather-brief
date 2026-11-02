@@ -4,359 +4,1135 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>강원대 원주캠 등굣길 브리핑</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Noto Sans KR 폰트 적용 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* Reset & Base Styles (외부 라이브러리 없이 순수 CSS로 구현) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      transition: background-color 0.4s ease;
+    }
+
+    /* 날씨 테마별 배경 스타일 (미션 1) */
+    body.theme-clear { background-color: #f0f9ff; }
+    body.theme-cloudy { background-color: #f1f5f9; }
+    body.theme-fog { background-color: #f3f4f6; }
+    body.theme-rain { background-color: #ecfeff; }
+    body.theme-snow { background-color: #f8fafc; }
+    body.theme-thunder { background-color: #faf5ff; }
+
+    @media (min-width: 640px) {
+      body {
+        padding: 24px;
+      }
+    }
+
+    .container {
+      max-width: 672px;
+      margin: 0 auto;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+    }
+
+    .header-info {
+      flex: 1;
+    }
+
+    .badge-univ {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background-color: #d1fae5;
+      color: #065f46;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .title {
+        font-size: 1.875rem;
+      }
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-dark {
+      background-color: #0f172a;
+      color: #ffffff;
+    }
+
+    .btn-dark:hover {
+      background-color: #1e293b;
+    }
+
+    .btn-outline {
+      background-color: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-outline:hover {
+      background-color: #f8fafc;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .icon-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 도시 검색 창 (미션 3) */
+    .search-section {
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .search-results {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .search-result-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      border: 1px solid #f1f5f9;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.15s;
+    }
+
+    .search-result-item:hover {
+      background-color: #e2e8f0;
+    }
+
+    .search-result-name {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .search-result-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* Banners & Alerts */
+    .banner {
+      margin-bottom: 24px;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .banner-warning {
+      background-color: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .banner-btn {
+      background: none;
+      border: none;
+      color: #92400e;
+      text-decoration: underline;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    /* Loading Spinner */
+    .loading-container {
+      margin: 64px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #10b981;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    .loading-text {
+      color: #475569;
+      font-weight: 500;
+    }
+
+    /* Section Cards Grid */
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 640px) {
+      .grid-cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      background-color: #f1f5f9;
+      color: #475569;
+    }
+
+    .card-status {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .card-desc {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Card Themes */
+    .card-theme-blue { background-color: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+    .card-theme-indigo { background-color: #eef2ff; border-color: #c7d2fe; color: #312e81; }
+    .card-theme-rose { background-color: #fff1f2; border-color: #fecdd3; color: #881337; }
+    .card-theme-neutral { background-color: #ffffff; border-color: #e2e8f0; color: #1e293b; }
+    .card-theme-gray { background-color: #f8fafc; border-color: #cbd5e1; color: #64748b; }
+
+    /* Detail Metrics Section */
+    .detail-box {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 640px) {
+      .detail-box {
+        padding: 24px;
+      }
+    }
+
+    .detail-header {
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .weather-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      background-color: #f1f5f9;
+      color: #334155;
+      border-radius: 8px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .metrics-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .metric-item {
+      background-color: #f8fafc;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #f1f5f9;
+    }
+
+    .metric-item-full {
+      grid-column: span 2;
+    }
+
+    @media (min-width: 640px) {
+      .metric-item-full {
+        grid-column: span 1;
+      }
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    @media (min-width: 640px) {
+      .metric-value {
+        font-size: 1.5rem;
+      }
+    }
+
+    .text-sm-val {
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    /* 시간별 강수확률 막대그래프 스타일 (미션 2) */
+    .hourly-graph-box {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .hourly-graph-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .hourly-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.875rem;
+    }
+
+    .hourly-time {
+      width: 48px;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.75rem;
+      text-align: right;
+    }
+
+    .hourly-bar-container {
+      flex: 1;
+      height: 18px;
+      background-color: #f1f5f9;
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hourly-bar {
+      height: 100%;
+      background-color: #3b82f6;
+      border-radius: 9999px;
+      transition: width 0.5s ease;
+    }
+
+    /* 50% 이상 강조 */
+    .hourly-bar.high-prob {
+      background-color: #f43f5e;
+    }
+
+    .hourly-value {
+      width: 42px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: #334155;
+      text-align: right;
+    }
+
+    /* Error Screen */
+    .error-container {
+      margin: 48px 0;
+      text-align: center;
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 16px;
+      padding: 32px 20px;
+      max-width: 448px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .error-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .error-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #7f1d1d;
+      margin-bottom: 8px;
+    }
+
+    .error-desc {
+      font-size: 0.875rem;
+      color: #991b1b;
+      margin-bottom: 24px;
+    }
+
+    .btn-retry {
+      padding: 10px 20px;
+      background-color: #dc2626;
+      color: #ffffff;
+      font-weight: 500;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      transition: background-color 0.2s;
+    }
+
+    .btn-retry:hover {
+      background-color: #b91c1c;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 24px;
+    }
+
+    /* Utility */
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between p-4 sm:p-6 md:p-8">
+<body>
 
   <!-- 메인 컨테이너 -->
-  <div class="max-w-2xl mx-auto w-full flex-grow">
+  <div class="container">
     
     <!-- 헤더 영역 -->
-    <header class="mb-6 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold mb-2">
-          <span>🏫 강원대학교 원주캠퍼스</span>
+    <header>
+      <div class="header-info">
+        <div class="badge-univ">
+          <span id="location-badge">🏫 강원대학교 원주캠퍼스</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">등굣길 브리핑 🎒</h1>
-        <p class="text-slate-500 text-sm mt-1">오늘 등굣길에 꼭 챙겨야 할 준비물을 알려드려요!</p>
+        <h1 class="title">
+          <span>등굣길 브리핑</span>
+          <span id="weather-dynamic-icon">🎒</span>
+        </h1>
+        <p class="subtitle">오늘 등굣길에 꼭 챙겨야 할 준비물을 알려드려요!</p>
       </div>
-      <!-- 새로고침 버튼 -->
-      <button id="refresh-btn" onclick="fetchData()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl shadow-sm transition duration-200 active:scale-95 disabled:opacity-50">
-        <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        <span>새로고침</span>
-      </button>
+      
+      <!-- 헤더 우측 컨트롤 (새로고침, 위치 검색 토글) -->
+      <div class="header-actions">
+        <button id="toggle-search-btn" onclick="toggleSearchBox()" class="btn btn-outline">
+          🔍 도시 검색
+        </button>
+        <button id="reset-loc-btn" onclick="resetToDefaultLocation()" class="btn btn-outline hidden">
+          📍 원주캠퍼스
+        </button>
+        <button id="refresh-btn" onclick="fetchData()" class="btn btn-dark">
+          <svg id="refresh-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>새로고침</span>
+        </button>
+      </div>
     </header>
 
-    <!-- 전체 경고/알림 바 (API 오류 안내용) -->
-    <div id="status-banner" class="hidden mb-6 p-4 rounded-xl text-sm font-medium transition-all"></div>
+    <!-- 도시 검색 패널 (미션 3) -->
+    <section id="search-section" class="search-section hidden">
+      <div class="search-box">
+        <input type="text" id="city-input" class="search-input" placeholder="도시 이름 검색 (예: 원주, 서울, Chuncheon, Tokyo)..." onkeyup="handleSearchKeyup(event)">
+        <button onclick="searchCity()" class="btn btn-dark">검색</button>
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </section>
 
-    <!-- 로딩 스피너 -->
-    <div id="loading-spinner" class="my-16 text-center flex flex-col items-center justify-center">
-      <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p class="text-slate-600 font-medium">최신 날씨 및 미세먼지 정보 수신 중...</p>
+    <!-- 경고 배너 (부분 오류 시 발생) -->
+    <div id="status-banner" class="banner banner-warning hidden"></div>
+
+    <!-- 로딩 상태 표시 -->
+    <div id="loading-spinner" class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">최신 날씨 및 미세먼지 정보 수신 중...</p>
     </div>
 
-    <!-- 데이터 콘텐츠 영역 (초기 숨김) -->
-    <main id="content-area" class="hidden space-y-6">
+    <!-- 메인 데이터 표시 영역 -->
+    <main id="content-area" class="hidden">
 
-      <!-- 1. 준비물 체크 카드 3종 -->
-      <section>
-        <h2 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+      <!-- 1. 준비물 판단 카드 3종 -->
+      <section style="margin-bottom: 24px;">
+        <h2 class="section-title">
           <span>💡 오늘 챙겨야 할 필수 아이템</span>
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="grid-cards">
           
           <!-- 우산 카드 -->
-          <div id="card-umbrella" class="p-5 rounded-2xl border bg-white shadow-sm flex flex-col justify-between transition hover:shadow-md">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-2xl">☂️</span>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">우산</span>
+          <div id="card-umbrella" class="card card-theme-neutral">
+            <div class="card-header">
+              <span class="card-icon">☂️</span>
+              <span class="card-tag">우산</span>
             </div>
             <div>
-              <div id="umbrella-status" class="text-xl font-bold text-slate-800">확인 중...</div>
-              <p id="umbrella-desc" class="text-xs text-slate-500 mt-1">강수확률 확인 불가</p>
+              <div id="umbrella-status" class="card-status">확인 불가</div>
+              <p id="umbrella-desc" class="card-desc">강수확률 확인 불가</p>
             </div>
           </div>
 
           <!-- 겉옷 카드 -->
-          <div id="card-coat" class="p-5 rounded-2xl border bg-white shadow-sm flex flex-col justify-between transition hover:shadow-md">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-2xl">🧥</span>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">겉옷</span>
+          <div id="card-coat" class="card card-theme-neutral">
+            <div class="card-header">
+              <span class="card-icon">🧥</span>
+              <span class="card-tag">겉옷</span>
             </div>
             <div>
-              <div id="coat-status" class="text-xl font-bold text-slate-800">확인 중...</div>
-              <p id="coat-desc" class="text-xs text-slate-500 mt-1">체감온도 확인 불가</p>
+              <div id="coat-status" class="card-status">확인 불가</div>
+              <p id="coat-desc" class="card-desc">체감온도 확인 불가</p>
             </div>
           </div>
 
           <!-- 마스크 카드 -->
-          <div id="card-mask" class="p-5 rounded-2xl border bg-white shadow-sm flex flex-col justify-between transition hover:shadow-md">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-2xl">😷</span>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">마스크</span>
+          <div id="card-mask" class="card card-theme-neutral">
+            <div class="card-header">
+              <span class="card-icon">😷</span>
+              <span class="card-tag">마스크</span>
             </div>
             <div>
-              <div id="mask-status" class="text-xl font-bold text-slate-800">확인 중...</div>
-              <p id="mask-desc" class="text-xs text-slate-500 mt-1">대기질 확인 불가</p>
+              <div id="mask-status" class="card-status">확인 불가</div>
+              <p id="mask-desc" class="card-desc">대기질 확인 불가</p>
             </div>
           </div>
 
         </div>
       </section>
 
-      <!-- 2. 상세 수치 지표 카드 -->
-      <section class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-        <h2 class="text-lg font-bold text-slate-900 flex items-center justify-between border-b pb-3">
+      <!-- 2. 시간별 강수확률 막대그래프 (미션 2) -->
+      <section class="hourly-graph-box">
+        <h2 class="section-title" style="margin-bottom: 4px;">
+          <span>☔ 09시 ~ 18시 시간별 강수확률</span>
+        </h2>
+        <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 12px;">* 50% 이상 시간대는 붉은색으로 강조 표시됩니다.</p>
+
+        <div id="hourly-graph-list" class="hourly-graph-list">
+          <!-- 시간별 그래프 아이템이 JS로 동적 삽입됩니다 -->
+        </div>
+      </section>
+
+      <!-- 3. 상세 기상 & 대기질 지표 영역 -->
+      <section class="detail-box">
+        <h2 class="section-title detail-header">
           <span>📊 상세 기상 & 대기질 지표</span>
-          <span id="weather-code-badge" class="text-xs font-normal px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg">--</span>
+          <span id="weather-code-badge" class="weather-badge">--</span>
         </h2>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div class="metrics-grid">
           <!-- 현재 기온 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-            <div class="text-xs text-slate-500 font-medium mb-1">현재 기온</div>
-            <div id="val-temp" class="text-xl sm:text-2xl font-extrabold text-slate-800">-- °C</div>
+          <div class="metric-item">
+            <div class="metric-label">현재 기온</div>
+            <div id="val-temp" class="metric-value">-- °C</div>
           </div>
 
           <!-- 체감 온도 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-            <div class="text-xs text-slate-500 font-medium mb-1">체감 온도</div>
-            <div id="val-apparent" class="text-xl sm:text-2xl font-extrabold text-slate-800">-- °C</div>
+          <div class="metric-item">
+            <div class="metric-label">체감 온도</div>
+            <div id="val-apparent" class="metric-value">-- °C</div>
           </div>
 
           <!-- 낮시간 최대 강수확률 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 col-span-2 sm:col-span-1">
-            <div class="text-xs text-slate-500 font-medium mb-1">낮 강수확률 (09-18시)</div>
-            <div id="val-pop" class="text-xl sm:text-2xl font-extrabold text-slate-800">최대 --%</div>
+          <div class="metric-item metric-item-full">
+            <div class="metric-label">낮 강수확률 (09-18시)</div>
+            <div id="val-pop" class="metric-value">최대 --%</div>
           </div>
 
           <!-- 미세먼지 PM10 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-            <div class="text-xs text-slate-500 font-medium mb-1">미세먼지 (PM10)</div>
-            <div id="val-pm10" class="text-xl sm:text-2xl font-extrabold text-slate-800">-- 𝜇g/m³</div>
+          <div class="metric-item">
+            <div class="metric-label">미세먼지 (PM10)</div>
+            <div id="val-pm10" class="metric-value">-- µg/m³</div>
           </div>
 
           <!-- 초미세먼지 PM2.5 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-            <div class="text-xs text-slate-500 font-medium mb-1">초미세먼지 (PM2.5)</div>
-            <div id="val-pm25" class="text-xl sm:text-2xl font-extrabold text-slate-800">-- 𝜇g/m³</div>
+          <div class="metric-item">
+            <div class="metric-label">초미세먼지 (PM2.5)</div>
+            <div id="val-pm25" class="metric-value">-- µg/m³</div>
           </div>
 
-          <!-- 갱신 정보 -->
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex flex-col justify-center">
-            <div class="text-xs text-slate-500 font-medium mb-1">마지막 갱신 시각</div>
-            <div id="val-updated" class="text-xs sm:text-sm font-bold text-slate-700">--:--:--</div>
+          <!-- 시각 정보 (API 관측 시각 & 조회 시각 구분) -->
+          <div class="metric-item" style="display: flex; flex-direction: column; justify-content: center;">
+            <div class="metric-label">데이터 시각 정보</div>
+            <div id="val-api-time" class="text-sm-val" style="color: #475569;">관측: --:--</div>
+            <div id="val-fetch-time" class="text-sm-val" style="color: #64748b; font-weight: 400; font-size: 0.75rem; margin-top: 2px;">조회: --:--:--</div>
           </div>
         </div>
       </section>
 
     </main>
 
-    <!-- 전체 에러 상태 화면 (두 API 모두 실패 시) -->
-    <div id="error-screen" class="hidden my-12 text-center bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md mx-auto">
-      <div class="text-4xl mb-3">⚠️</div>
-      <h3 class="text-lg font-bold text-red-900 mb-2">데이터를 불러오지 못했습니다</h3>
-      <p class="text-sm text-red-700 mb-6">네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.</p>
-      <button onclick="fetchData()" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow transition active:scale-95">
-        다시 시도하기
-      </button>
+    <!-- 전면 에러 화면 (두 API 모두 실패 시) -->
+    <div id="error-screen" class="error-container hidden">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">데이터를 불러오지 못했습니다</h3>
+      <p class="error-desc">네트워크 연결 상태를 확인하거나 잠시 후 다시 시도해 주세요.</p>
+      <button onclick="fetchData()" class="btn-retry">다시 시도하기</button>
     </div>
 
   </div>
 
   <!-- 푸터 영역 -->
-  <footer class="mt-12 text-center text-xs text-slate-400 border-t border-slate-200 pt-6">
+  <footer>
     <p>Weather data by Open-Meteo.com · Air quality: CAMS</p>
   </footer>
 
-  <!-- JavaScript 구현 -->
+  <!-- 스크립트 -->
   <script>
-    // 강원대학교 원주캠퍼스 위도/경도 (매지캠퍼스 기준: lat 37.30, lon 127.92)
-    const LAT = 37.30;
-    const LON = 127.92;
-
-    const WEATHER_URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code&hourly=precipitation_probability&timezone=Asia/Seoul&forecast_days=1`;
-    const AIR_URL = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LON}&current=pm10,pm2_5&timezone=Asia/Seoul`;
-
-    // WMO Weather Code 한글 변환 표
-    const WMO_CODES = {
-      0: '맑음 ☀️',
-      1: '대체로 맑음 🌤️', 2: '구름 조금 ⛅', 3: '흐림 ☁️',
-      45: '안개 🌫️', 48: '짙은 안개 🌫️',
-      51: '이슬비 🌧️', 53: '이슬비 🌧️', 55: '짙은 이슬비 🌧️',
-      61: '약한 비 🌧️', 63: '비 🌧️', 65: '강한 비 🌧️',
-      71: '약한 눈 ❄️', 73: '눈 ❄️', 75: '강한 눈 ❄️',
-      80: '소나기 🌦️', 81: '강한 소나기 🌦️', 82: '격렬한 소나기 ⛈️',
-      95: '뇌우 🌩️', 96: '뇌우 및 우박 ⛈️', 99: '강한 뇌우 ⛈️'
+    // 기본 위치 설정 (강원대학교 원주캠퍼스 37.30, 127.92)
+    const DEFAULT_LOCATION = {
+      name: '강원대학교 원주캠퍼스',
+      badge: '🏫 강원대학교 원주캠퍼스',
+      lat: 37.30,
+      lon: 127.92
     };
 
-    // DOM 요소 참조
+    // 현재 활성화된 위치 정보
+    let currentLocation = { ...DEFAULT_LOCATION };
+
+    // WMO 코드 표 및 배경 테마 정의 (미션 1)
+    const WMO_CODES = {
+      0: { text: '맑음 ☀️', theme: 'theme-clear', icon: '☀️' },
+      1: { text: '대체로 맑음 🌤️', theme: 'theme-cloudy', icon: '🌤️' },
+      2: { text: '구름 조금 ⛅', theme: 'theme-cloudy', icon: '⛅' },
+      3: { text: '흐림 ☁️', theme: 'theme-cloudy', icon: '☁️' },
+      45: { text: '안개 🌫️', theme: 'theme-fog', icon: '🌫️' },
+      48: { text: '짙은 안개 🌫️', theme: 'theme-fog', icon: '🌫️' },
+      51: { text: '이슬비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      53: { text: '이슬비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      55: { text: '짙은 이슬비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      56: { text: '어는 이슬비 🌨️', theme: 'theme-rain', icon: '🌨️' },
+      57: { text: '짙은 어는 이슬비 🌨️', theme: 'theme-rain', icon: '🌨️' },
+      61: { text: '약한 비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      63: { text: '비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      65: { text: '강한 비 🌧️', theme: 'theme-rain', icon: '🌧️' },
+      66: { text: '약한 어는 비 🌨️', theme: 'theme-rain', icon: '🌨️' },
+      67: { text: '강한 어는 비 🌨️', theme: 'theme-rain', icon: '🌨️' },
+      71: { text: '약한 눈 ❄️', theme: 'theme-snow', icon: '❄️' },
+      73: { text: '눈 ❄️', theme: 'theme-snow', icon: '❄️' },
+      75: { text: '강한 눈 ❄️', theme: 'theme-snow', icon: '❄️' },
+      77: { text: '눈날림 ❄️', theme: 'theme-snow', icon: '❄️' },
+      80: { text: '소나기 🌦️', theme: 'theme-rain', icon: '🌦️' },
+      81: { text: '강한 소나기 🌦️', theme: 'theme-rain', icon: '🌦️' },
+      82: { text: '격렬한 소나기 ⛈️', theme: 'theme-rain', icon: '⛈️' },
+      85: { text: '약한 눈 소나기 🌨️', theme: 'theme-snow', icon: '🌨️' },
+      86: { text: '강한 눈 소나기 🌨️', theme: 'theme-snow', icon: '🌨️' },
+      95: { text: '뇌우 🌩️', theme: 'theme-thunder', icon: '🌩️' },
+      96: { text: '뇌우 및 우박 ⛈️', theme: 'theme-thunder', icon: '⛈️' },
+      99: { text: '강한 뇌우 ⛈️', theme: 'theme-thunder', icon: '⛈️' }
+    };
+
+    // DOM Element References
     const loadingSpinner = document.getElementById('loading-spinner');
     const contentArea = document.getElementById('content-area');
     const errorScreen = document.getElementById('error-screen');
     const statusBanner = document.getElementById('status-banner');
     const refreshBtn = document.getElementById('refresh-btn');
     const refreshIcon = document.getElementById('refresh-icon');
+    const searchSection = document.getElementById('search-section');
+    const cityInput = document.getElementById('city-input');
+    const searchResults = document.getElementById('search-results');
+    const locationBadge = document.getElementById('location-badge');
+    const resetLocBtn = document.getElementById('reset-loc-btn');
+    const weatherDynamicIcon = document.getElementById('weather-dynamic-icon');
 
-    // 앱 데이터 초기 로딩
+    // 유효한 숫자 데이터인지 엄격하게 검증하는 helper (0도 유효한 숫자로 간주)
+    function isValidNumber(val) {
+      return val !== null && val !== undefined && typeof val === 'number' && !isNaN(val);
+    }
+
     window.onload = function() {
       fetchData();
     };
 
+    // 미션 3: 도시 검색 패널 토글
+    function toggleSearchBox() {
+      searchSection.classList.toggle('hidden');
+      if (!searchSection.classList.contains('hidden')) {
+        cityInput.focus();
+      }
+    }
+
+    function handleSearchKeyup(e) {
+      if (e.key === 'Enter') {
+        searchCity();
+      }
+    }
+
+    // 미션 3: Open-Meteo Geocoding API 도시 검색
+    async function searchCity() {
+      const query = cityInput.value.trim();
+      if (!query) return;
+
+      searchResults.innerHTML = '<div style="font-size:0.875rem; color:#64748b; padding:8px;">검색 중...</div>';
+
+      try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=ko`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Geocoding Error');
+        const data = await res.json();
+
+        if (!data.results || data.results.length === 0) {
+          searchResults.innerHTML = '<div style="font-size:0.875rem; color:#ef4444; padding:8px;">검색 결과가 없습니다. 다른 도시 이름으로 검색해 보세요.</div>';
+          return;
+        }
+
+        renderSearchResults(data.results);
+      } catch (e) {
+        console.error('도시 검색 오류:', e);
+        searchResults.innerHTML = '<div style="font-size:0.875rem; color:#ef4444; padding:8px;">도시 정보를 불러올 수 없습니다.</div>';
+      }
+    }
+
+    function renderSearchResults(results) {
+      searchResults.innerHTML = '';
+      results.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'search-result-item';
+
+        const regionParts = [item.admin1, item.country].filter(Boolean).join(', ');
+        
+        div.innerHTML = `
+          <div>
+            <span class="search-result-name">${item.name}</span>
+            <span class="search-result-sub"> (${regionParts})</span>
+          </div>
+          <span style="font-size:0.75rem; font-weight:600; color:#10b981;">선택 ➔</span>
+        `;
+
+        div.onclick = () => selectCity(item);
+        searchResults.appendChild(div);
+      });
+    }
+
+    // 미션 3: 선택한 도시 정보로 위치 변경 및 데이터 갱신
+    function selectCity(city) {
+      const regionName = [city.name, city.admin1].filter(Boolean).join(' ');
+      currentLocation = {
+        name: city.name,
+        badge: `📍 ${regionName}`,
+        lat: city.latitude,
+        lon: city.longitude
+      };
+
+      locationBadge.textContent = currentLocation.badge;
+      resetLocBtn.classList.remove('hidden');
+      searchSection.classList.add('hidden');
+      searchResults.innerHTML = '';
+      cityInput.value = '';
+
+      fetchData();
+    }
+
+    // 미션 3: 기본 원주캠퍼스로 돌아가기
+    function resetToDefaultLocation() {
+      currentLocation = { ...DEFAULT_LOCATION };
+      locationBadge.textContent = currentLocation.badge;
+      resetLocBtn.classList.add('hidden');
+      searchSection.classList.add('hidden');
+      fetchData();
+    }
+
+    // 메인 API 호출 함수
     async function fetchData() {
-      // 로딩 UI 처리
       loadingSpinner.classList.remove('hidden');
       contentArea.classList.add('hidden');
       errorScreen.classList.add('hidden');
       statusBanner.classList.add('hidden');
       refreshBtn.disabled = true;
-      refreshIcon.classList.add('animate-spin');
+      refreshIcon.classList.add('icon-spin');
+
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=temperature_2m,apparent_temperature,weather_code&hourly=precipitation_probability&timezone=Asia/Seoul&forecast_days=1`;
+      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${currentLocation.lat}&longitude=${currentLocation.lon}&current=pm10,pm2_5&timezone=Asia/Seoul`;
 
       let weatherData = null;
       let airData = null;
       let weatherError = false;
       let airError = false;
 
-      // 1. Weather API 호출
+      // 날씨 API 호출
       try {
-        const resWeather = await fetch(WEATHER_URL);
-        if (!resWeather.ok) throw new Error('Weather API 응답 오류');
-        weatherData = await resWeather.json();
-      } catch (err) {
-        console.error('날씨 데이터 불러오기 실패:', err);
+        const res = await fetch(weatherUrl);
+        if (!res.ok) throw new Error('Weather HTTP Error');
+        weatherData = await res.json();
+      } catch (e) {
+        console.error('날씨 API 오류:', e);
         weatherError = true;
       }
 
-      // 2. Air Quality API 호출
+      // 대기질 API 호출
       try {
-        const resAir = await fetch(AIR_URL);
-        if (!resAir.ok) throw new Error('Air Quality API 응답 오류');
-        airData = await resAir.json();
-      } catch (err) {
-        console.error('대기질 데이터 불러오기 실패:', err);
+        const res = await fetch(airUrl);
+        if (!res.ok) throw new Error('Air Quality HTTP Error');
+        airData = await res.json();
+      } catch (e) {
+        console.error('대기질 API 오류:', e);
         airError = true;
       }
 
-      // 로딩 종료 UI 처리
       loadingSpinner.classList.add('hidden');
       refreshBtn.disabled = false;
-      refreshIcon.classList.remove('animate-spin');
+      refreshIcon.classList.remove('icon-spin');
 
-      // 3. 상태 분기
       if (weatherError && airError) {
-        // 둘 다 실패 시 에러 화면 표시
         errorScreen.classList.remove('hidden');
         return;
       }
 
-      // 하나라도 성공했으면 메인 콘텐츠 표시
       contentArea.classList.remove('hidden');
 
-      // 부분 에러 경고 배너 표시
       if (weatherError || airError) {
-        statusBanner.classList.remove('hidden');
-        statusBanner.className = 'mb-6 p-4 rounded-xl text-sm font-medium bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-between';
+        const failedTarget = weatherError ? '날씨 정보' : '대기질 정보';
         statusBanner.innerHTML = `
-          <span>⚠️ ${weatherError ? '날씨 정보' : '대기질 정보'}를 불러올 수 없습니다. 가능한 데이터만 표시합니다.</span>
-          <button onclick="fetchData()" class="underline font-bold text-xs ml-2 hover:text-amber-900">다시 시도</button>
+          <span>⚠️ ${failedTarget}를 불러오지 못했습니다. 불러온 데이터만 표시합니다.</span>
+          <button onclick="fetchData()" class="banner-btn">다시 시도</button>
         `;
+        statusBanner.classList.remove('hidden');
       }
 
-      // 4. 데이터 랜더링 및 판단 로직 적용
       renderApp(weatherData, airData);
     }
 
     function renderApp(weather, air) {
-      // --- A. 날씨 및 판단 (우산, 겉옷) ---
-      let maxPop = null; // 09~18시 최대 강수확률
+      const fetchTime = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+      let apiObservedTime = null;
+
+      // -------------------------------------------------------------
+      // 1. 날씨 데이터 파싱 및 판단 (09~18시 강수확률 최댓값, 체감온도)
+      // -------------------------------------------------------------
+      let maxPop = null;
       let currentTemp = null;
       let apparentTemp = null;
       let weatherCode = null;
+      let hourlyList = [];
 
-      if (weather && weather.current && weather.hourly) {
-        currentTemp = weather.current.temperature_2m;
-        apparentTemp = weather.current.apparent_temperature;
-        weatherCode = weather.current.weather_code;
-
-        // 09시 ~ 18시 강수 확률 구하기
-        if (weather.hourly.time && weather.hourly.precipitation_probability) {
-          const times = weather.hourly.time; // 예: "2026-11-02T09:00"
-          const pops = weather.hourly.precipitation_probability;
-
-          const daytimePops = [];
-          for (let i = 0; i < times.length; i++) {
-            const hour = new Date(times[i]).getHours();
-            if (hour >= 9 && hour <= 18) {
-              daytimePops.push(pops[i]);
-            }
-          }
-
-          if (daytimePops.length > 0) {
-            maxPop = Math.max(...daytimePops);
-          }
+      if (weather && weather.current) {
+        if (isValidNumber(weather.current.temperature_2m)) currentTemp = weather.current.temperature_2m;
+        if (isValidNumber(weather.current.apparent_temperature)) apparentTemp = weather.current.apparent_temperature;
+        if (isValidNumber(weather.current.weather_code)) weatherCode = weather.current.weather_code;
+        if (weather.current.time) {
+          apiObservedTime = weather.current.time.split('T')[1] || weather.current.time;
         }
       }
 
-      // --- B. 대기질 및 판단 (마스크) ---
-      let pm10 = null;
-      let pm2_5 = null;
+      // 미션 1: 날씨별 배경 테마 및 아이콘 업데이트
+      updateWeatherTheme(weatherCode);
 
-      if (air && air.current) {
-        pm10 = air.current.pm10;
-        pm2_5 = air.current.pm2_5;
+      if (weather && weather.hourly && Array.isArray(weather.hourly.time) && Array.isArray(weather.hourly.precipitation_probability)) {
+        const times = weather.hourly.time;
+        const pops = weather.hourly.precipitation_probability;
+        const daytimePops = [];
+
+        for (let i = 0; i < times.length; i++) {
+          const timeStr = times[i];
+          const hourMatch = timeStr.match(/T(\d{2}):/);
+          if (hourMatch) {
+            const hour = parseInt(hourMatch[1], 10);
+            if (hour >= 9 && hour <= 18) {
+              const popVal = isValidNumber(pops[i]) ? pops[i] : null;
+              if (popVal !== null) daytimePops.push(popVal);
+
+              // 미션 2: 시간별 막대그래프 데이터 세트 생성
+              hourlyList.push({
+                hour: `${hour.toString().padStart(2, '0')}:00`,
+                pop: popVal
+              });
+            }
+          }
+        }
+
+        if (daytimePops.length > 0) {
+          maxPop = Math.max(...daytimePops);
+        }
       }
 
-      // --- C. 준비물 판단 로직 ---
-      // 1) 우산 판단 (09~18시 최대 강수확률 >= 50%)
-      if (maxPop === null || maxPop === undefined) {
-        updateCard('umbrella', '확인 불가', '강수확률 수치 없음', 'gray');
+      // 우산 카드 판단 (최대 강수확률 >= 50%)
+      if (isValidNumber(maxPop)) {
+        document.getElementById('val-pop').textContent = `최대 ${maxPop}%`;
+        if (maxPop >= 50) {
+          updateCard('umbrella', '우산 챙기기 ☔', `낮 최대 강수확률 ${maxPop}%`, 'blue');
+        } else {
+          updateCard('umbrella', '필요 없음 ☀️', `낮 최대 강수확률 ${maxPop}%`, 'neutral');
+        }
+      } else {
         document.getElementById('val-pop').textContent = '확인 불가';
-      } else if (maxPop >= 50) {
-        updateCard('umbrella', '우산 챙기기 ☔', `낮 최대 강수확률 ${maxPop}%`, 'blue');
-        document.getElementById('val-pop').textContent = `최대 ${maxPop}%`;
-      } else {
-        updateCard('umbrella', '필요 없음 ☀️', `낮 최대 강수확률 ${maxPop}%`, 'neutral');
-        document.getElementById('val-pop').textContent = `최대 ${maxPop}%`;
+        updateCard('umbrella', '확인 불가', '09-18시 강수확률 데이터 없음', 'gray');
       }
 
-      // 2) 겉옷 판단 (체감온도 <= 10°C)
-      if (apparentTemp === null || apparentTemp === undefined) {
-        updateCard('coat', '확인 불가', '체감온도 수치 없음', 'gray');
+      // 겉옷 카드 판단 (체감온도 <= 10°C)
+      if (isValidNumber(apparentTemp)) {
+        document.getElementById('val-apparent').textContent = `${apparentTemp} °C`;
+        if (apparentTemp <= 10) {
+          updateCard('coat', '겉옷 챙기기 🧥', `체감온도 ${apparentTemp}°C (쌀쌀함)`, 'indigo');
+        } else {
+          updateCard('coat', '필요 없음 👕', `체감온도 ${apparentTemp}°C (포근함)`, 'neutral');
+        }
+      } else {
         document.getElementById('val-apparent').textContent = '확인 불가';
-      } else if (apparentTemp <= 10) {
-        updateCard('coat', '겉옷 챙기기 🧥', `체감온도 ${apparentTemp}°C (쌀쌀함)`, 'indigo');
-        document.getElementById('val-apparent').textContent = `${apparentTemp} °C`;
-      } else {
-        updateCard('coat', '필요 없음 👕', `체감온도 ${apparentTemp}°C (포근함)`, 'neutral');
-        document.getElementById('val-apparent').textContent = `${apparentTemp} °C`;
+        updateCard('coat', '확인 불가', '체감온도 수치 없음', 'gray');
       }
 
-      // 3) 마스크 판단 (PM10 >= 81 또는 PM2.5 >= 36)
-      if (pm10 === null || pm2_5 === null || pm10 === undefined || pm2_5 === undefined) {
-        updateCard('mask', '확인 불가', '대기질 데이터 없음', 'gray');
-        document.getElementById('val-pm10').textContent = '확인 불가';
-        document.getElementById('val-pm25').textContent = '확인 불가';
-      } else if (pm10 >= 81 || pm2_5 >= 36) {
-        const reason = pm10 >= 81 ? `PM10 (${pm10}) 나쁨` : `PM2.5 (${pm2_5}) 나쁨`;
-        updateCard('mask', '마스크 챙기기 😷', reason, 'rose');
-        document.getElementById('val-pm10').textContent = `${pm10} 𝜇g/m³`;
-        document.getElementById('val-pm25').textContent = `${pm2_5} 𝜇g/m³`;
-      } else {
-        updateCard('mask', '필요 없음 🍃', `PM10: ${pm10}, PM2.5: ${pm2_5} (양호)`, 'neutral');
-        document.getElementById('val-pm10').textContent = `${pm10} 𝜇g/m³`;
-        document.getElementById('val-pm25').textContent = `${pm2_5} 𝜇g/m³`;
-      }
-
-      // --- D. 기타 화면 요소 갱신 ---
-      document.getElementById('val-temp').textContent = currentTemp !== null ? `${currentTemp} °C` : '확인 불가';
-      
+      // 현재 기온 & 날씨 코드 표기
+      document.getElementById('val-temp').textContent = isValidNumber(currentTemp) ? `${currentTemp} °C` : '확인 불가';
       const badge = document.getElementById('weather-code-badge');
-      if (weatherCode !== null && WMO_CODES[weatherCode]) {
-        badge.textContent = WMO_CODES[weatherCode];
+      if (weatherCode !== null && WMO_CODES[weatherCode] !== undefined) {
+        badge.textContent = WMO_CODES[weatherCode].text;
       } else {
         badge.textContent = '날씨 정보 없음';
       }
 
-      // 마지막 갱신 시간
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('ko-KR', { hour12: false });
-      document.getElementById('val-updated').textContent = timeString;
+      // 미션 2: 시간별 강수확률 막대그래프 렌더링
+      renderHourlyGraph(hourlyList);
+
+      // -------------------------------------------------------------
+      // 2. 대기질 데이터 파싱 및 판단 (PM10, PM2.5)
+      // -------------------------------------------------------------
+      let pm10 = null;
+      let pm2_5 = null;
+
+      if (air && air.current) {
+        if (isValidNumber(air.current.pm10)) pm10 = air.current.pm10;
+        if (isValidNumber(air.current.pm2_5)) pm2_5 = air.current.pm2_5;
+        if (!apiObservedTime && air.current.time) {
+          apiObservedTime = air.current.time.split('T')[1] || air.current.time;
+        }
+      }
+
+      document.getElementById('val-pm10').textContent = isValidNumber(pm10) ? `${pm10} µg/m³` : '확인 불가';
+      document.getElementById('val-pm25').textContent = isValidNumber(pm2_5) ? `${pm2_5} µg/m³` : '확인 불가';
+
+      // 마스크 카드 판단 규칙
+      const pm10Valid = isValidNumber(pm10);
+      const pm25Valid = isValidNumber(pm2_5);
+
+      if ((pm10Valid && pm10 >= 81) || (pm25Valid && pm2_5 >= 36)) {
+        let reason = '';
+        if (pm10Valid && pm10 >= 81) reason = `미세먼지(${pm10}) 나쁨`;
+        else reason = `초미세먼지(${pm2_5}) 나쁨`;
+        updateCard('mask', '마스크 챙기기 😷', reason, 'rose');
+      } else if (pm10Valid && pm25Valid) {
+        updateCard('mask', '필요 없음 🍃', `PM10: ${pm10}, PM2.5: ${pm2_5} (양호)`, 'neutral');
+      } else {
+        updateCard('mask', '확인 불가', '대기질 측정 수치 부족', 'gray');
+      }
+
+      // -------------------------------------------------------------
+      // 3. 데이터 시각 정보 표기 (관측 시각 vs 조회 시각)
+      // -------------------------------------------------------------
+      document.getElementById('val-api-time').textContent = `관측: ${apiObservedTime || '--:--'}`;
+      document.getElementById('val-fetch-time').textContent = `조회: ${fetchTime}`;
     }
 
-    // 카드 스타일 및 문구 업데이트 함수
+    // 미션 1: WMO weather_code 기반 배경 테마 및 타이틀 아이콘 동적 업데이트
+    function updateWeatherTheme(code) {
+      document.body.className = ''; // 기존 테마 클래스 제거
+      
+      if (code !== null && WMO_CODES[code]) {
+        const themeInfo = WMO_CODES[code];
+        document.body.classList.add(themeInfo.theme);
+        weatherDynamicIcon.textContent = themeInfo.icon;
+      } else {
+        document.body.classList.add('theme-cloudy');
+        weatherDynamicIcon.textContent = '🎒';
+      }
+    }
+
+    // 미션 2: 시간별 강수확률 가로 막대그래프 렌더링
+    function renderHourlyGraph(list) {
+      const container = document.getElementById('hourly-graph-list');
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div style="font-size:0.875rem; color:#94a3b8; text-align:center; padding:12px;">강수확률 정보 없음</div>';
+        return;
+      }
+
+      list.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'hourly-item';
+
+        const valText = isValidNumber(item.pop) ? `${item.pop}%` : '-';
+        const barWidth = isValidNumber(item.pop) ? `${Math.min(Math.max(item.pop, 0), 100)}%` : '0%';
+        const isHigh = isValidNumber(item.pop) && item.pop >= 50;
+
+        row.innerHTML = `
+          <div class="hourly-time">${item.hour}</div>
+          <div class="hourly-bar-container">
+            <div class="hourly-bar ${isHigh ? 'high-prob' : ''}" style="width: ${barWidth};"></div>
+          </div>
+          <div class="hourly-value" style="${isHigh ? 'color:#e11d48;' : ''}">${valText}</div>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    // 카드 UI 업데이트
     function updateCard(type, title, desc, colorTheme) {
       const card = document.getElementById(`card-${type}`);
       const statusEl = document.getElementById(`${type}-status`);
@@ -365,17 +1141,15 @@
       statusEl.textContent = title;
       descEl.textContent = desc;
 
-      // 테마별 색상 적용 (Tailwind 클래스)
       const themeClasses = {
-        blue: 'bg-blue-50 border-blue-200 text-blue-900',
-        indigo: 'bg-indigo-50 border-indigo-200 text-indigo-900',
-        rose: 'bg-rose-50 border-rose-200 text-rose-900',
-        neutral: 'bg-slate-50 border-slate-200 text-slate-800',
-        gray: 'bg-gray-100 border-gray-200 text-gray-500'
+        blue: 'card-theme-blue',
+        indigo: 'card-theme-indigo',
+        rose: 'card-theme-rose',
+        neutral: 'card-theme-neutral',
+        gray: 'card-theme-gray'
       };
 
-      // 기존 배경/테두리 클래스 초기화 후 신규 적용
-      card.className = `p-5 rounded-2xl border shadow-sm flex flex-col justify-between transition hover:shadow-md ${themeClasses[colorTheme] || themeClasses.neutral}`;
+      card.className = `card ${themeClasses[colorTheme] || themeClasses.neutral}`;
     }
   </script>
 </body>
